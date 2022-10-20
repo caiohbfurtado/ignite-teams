@@ -10,6 +10,7 @@ import { Filter } from '@components/Filter'
 import { PlayerCard } from '@components/PlayerCard'
 import { ListEmpty } from '@components/ListEmpty'
 import { Button } from '@components/Button'
+import { Loading } from '@components/Loading'
 
 import * as S from './styles'
 
@@ -27,6 +28,7 @@ type RouteParams = {
 export function Players() {
   const route = useRoute()
   const navigation = useNavigation()
+  const [isLoading, setIsLoading] = useState(true)
   const [players, setPlayers] = useState<PlayerStorageDTO[]>([])
   const [team, setTeam] = useState('Time A')
   const [newPlayerName, setNewPlayerName] = useState('')
@@ -94,6 +96,7 @@ export function Players() {
 
   async function fetchPlayersByTeam() {
     try {
+      setIsLoading(true)
       const playersByTeam = await getPlayersByGroupAndTeam(group, team)
       setPlayers(playersByTeam)
     } catch (error) {
@@ -102,6 +105,8 @@ export function Players() {
         'Pessoas',
         'Não foi possível carregar os jogadores do time selecionado',
       )
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -145,24 +150,28 @@ export function Players() {
         <S.NumberOfPlayers>{players.length}</S.NumberOfPlayers>
       </S.HeaderList>
 
-      <FlatList
-        data={players}
-        keyExtractor={(item) => item.name}
-        renderItem={({ item }) => (
-          <PlayerCard
-            name={item.name}
-            onDelete={() => handleDeletePlayerByGroup(item.name)}
-          />
-        )}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <ListEmpty message="Ainda não há nenhum jogador nesse time" />
-        }
-        contentContainerStyle={[
-          { paddingBottom: 100 },
-          players.length === 0 && { flex: 1 },
-        ]}
-      />
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <FlatList
+          data={players}
+          keyExtractor={(item) => item.name}
+          renderItem={({ item }) => (
+            <PlayerCard
+              name={item.name}
+              onDelete={() => handleDeletePlayerByGroup(item.name)}
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <ListEmpty message="Ainda não há nenhum jogador nesse time" />
+          }
+          contentContainerStyle={[
+            { paddingBottom: 100 },
+            players.length === 0 && { flex: 1 },
+          ]}
+        />
+      )}
 
       <Button
         title="Remover grupo"
