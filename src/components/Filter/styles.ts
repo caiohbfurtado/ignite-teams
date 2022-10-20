@@ -23,7 +23,7 @@ export const Container = styled.TouchableOpacity<StyledFilterProps>`
 export const Title = styled.Text`
   ${({ theme }) => css`
     font-family: ${theme.FONT_FAMILY.BOLD};
-    font-size: ${theme.FONT_SIZE.SM};
+    font-size: ${theme.FONT_SIZE.SM}px;
     color: ${theme.COLORS.WHITE};
   `}
 
